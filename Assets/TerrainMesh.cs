@@ -11,9 +11,18 @@ public class TerrainMesh : MonoBehaviour
     Mesh mesh;
     MeshCreator mc = new MeshCreator();
 
-    public Vector3 size = Vector3.one;
-    public float offset = 1.2f;
-    float noiseAmt = 0;
+    [Range(4, 200)]
+    public int length = 50, width = 50;
+
+    [Range(.01f, 2)]
+    public float offset;
+
+    [Range(0,20)]
+    public float noiseAmt = 0;
+    [Range(.1f, 20)]
+    public float rangex, rangey = 10;
+    [Range(0, 20)]
+    public float intensity = 10;
 
     // Use this for initialization
     void Start()
@@ -27,8 +36,7 @@ public class TerrainMesh : MonoBehaviour
     void Update()
     {
         mc.Clear();
-        CreatePlane(50, 50);
-        noiseAmt += .02f;
+        CreatePlane(length, width);
     }
 
     void CreatePlane(int length, int width)
@@ -39,7 +47,8 @@ public class TerrainMesh : MonoBehaviour
         {
             for (int z = 0; z <= width; z++)
             {
-                vertices.Add(new Vector3(x,0,z));
+                Vector3 noiseVert = new Vector3(((float) x)/rangex, ((float) z)/rangey, noiseAmt);
+                vertices.Add(new Vector3(x * offset,Perlin.Noise(noiseVert)*intensity,z * offset));
             }
         } 
 
@@ -49,7 +58,7 @@ public class TerrainMesh : MonoBehaviour
         {
             for (int z = 0; z < length; z++)
             {
-                mc.BuildTriangle(vertices[x * (width + 1) + z], vertices[x * (width + 1) + (z + 1)], vertices[(x - 1) * (width + 1) + (z + 1)]);
+                mc.BuildTriangle(vertices[x * (width + 1) + (z + 1)], vertices[x * (width + 1) + z], vertices[(x - 1) * (width + 1) + (z + 1)]);
                 mc.BuildTriangle(vertices[x*(width+1)+z], vertices[(x-1) * (width + 1) + z], vertices[(x-1) * (width + 1) + (z+1)]);
             }
         }
